@@ -48,3 +48,15 @@ Then update the `config/default.yaml` file with the baseline model name and run 
    ```bash
    python main.py
    ```
+
+## Citation
+
+```bibtex
+@article{qiu2024unveiling,
+  title={Unveiling User Preferences: A Knowledge Graph and LLM-Driven Approach for Conversational Recommendation},
+  author={Qiu, Zhangchi and Luo, Linhao and Pan, Shirui and Liew, Alan Wee-Chung},
+  journal={arXiv preprint arXiv:2411.14459},
+  year={2024},
+}
+
+```
