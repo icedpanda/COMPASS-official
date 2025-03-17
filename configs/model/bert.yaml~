@@ -1,0 +1,4 @@
+defaults:
+  - /model@rec: rec/bert
+
+system_name: baseline

@@ -1,0 +1,4 @@
+defaults:
+  - /model@rec: rec/kbrd
+
+system_name: redial_kbrd

@@ -1,0 +1,24 @@
+# https://lightning.ai/docs/pytorch/stable/common/trainer.html
+_target_: lightning.Trainer
+# default values for all trainer parameters
+accelerator: cpu # (“cpu”, “gpu”, “tpu”, “ipu”, “hpu”, “mps”, “auto”)
+devices: 1
+num_nodes: 1 # Number of GPU nodes for distributed training
+precision: 32 # Full precision (32), half precision (16).
+fast_dev_run: False # runs 1 batch of train, test  and val to find any bugs (ie: a sort of unit test)
+max_epochs: ??? # Stop training once this number of epochs is reached. Must be specified !!!
+min_epochs: 1 # Force training for at least these many epochs
+#limit_train_batches: 1.0 # How much of training dataset to check (float = fraction, int = num_batches)
+#limit_val_batches: 1.0 # How much of validation dataset to check (float = fraction, int = num_batches)
+#limit_test_batches: 1.0 # How much of test dataset to check (float = fraction, int = num_batches)
+check_val_every_n_epoch: 1 # Check val every n train epochs
+num_sanity_val_steps: 2 # Sanity check runs n batches of val before starting the training routine
+log_every_n_steps: 50 # How often to log within steps (defaults to every 50 steps)
+accumulate_grad_batches: 1 # Accumulates grads every k batches or as set up in the dict.
+gradient_clip_val: null # The value at which to clip gradients
+deterministic: False # If True, sets the CuDNN deterministic flag
+benchmark: False # If True, sets the CuDNN benchmark flag
+reload_dataloaders_every_n_epochs: 0 # Set to a non-negative integer to reload dataloaders every n epochs
+sync_batchnorm: False # Synchronize batch norm layers between process groups/whole world
+enable_model_summary: True
+strategy: "auto"

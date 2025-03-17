@@ -1,0 +1,16 @@
+defaults:
+  - common
+  - _self_
+
+model_checkpoint:
+  save_weights_only: True # if True, then only the model’s weights will be saved
+  dirpath: ${paths.output_dir}/rec/checkpoints
+  filename: "recommendation_{epoch:03d}"
+  monitor: "val/rec/lm_epoch_loss"
+  mode: "min"
+  save_last: False
+
+early_stopping:
+  monitor: "val/rec/lm_epoch_loss"
+  patience: 3
+  mode: "min"

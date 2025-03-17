@@ -1,0 +1,5 @@
+defaults:
+  - /callbacks@align: tasks/alignment
+  - /callbacks@rec: tasks/gen
+
+

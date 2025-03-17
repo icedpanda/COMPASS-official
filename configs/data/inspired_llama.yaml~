@@ -1,0 +1,23 @@
+defaults:
+  - dataset
+  - /data@dataloader.rec: dataloader
+
+dataset:
+  dataset_name: "INSPIRED"
+  response_max_len: 32
+  context_max_len: 200
+  restore: False
+  use_chatgpt: True
+  tokenizer_name: "bert-base-uncased"
+  llm_tokenizer_name: "meta-llama/Meta-Llama-3-8B-Instruct"
+
+
+dataloader:
+  rec:
+    _target_: src.llmcrs.data.ReDialDataModule
+    num_workers: 6
+    train_batch_size: 8
+    val_batch_size: 32
+    test_batch_size: 32
+    is_baseline: False
+    include_rec: True

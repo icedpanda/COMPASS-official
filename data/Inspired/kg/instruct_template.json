@@ -1,0 +1,37 @@
+{
+  "rec": [
+    "As a movie recommender, please recommend a movie that aligns with the user's interests discussed in the provided conversation history.\nConversation History:\n",
+    "Acting as a movie suggestion tool, utilize the user’s preferences mentioned in the provided conversation history to suggest a suitable movie.\nConversation History:\n",
+    "Based on the details of the user's likes and dislikes in the provided conversation history, identify a movie that matches their interests.\nHistory:\n",
+    "Considering the interests the user has mentioned previously, can you recommend a film that would suit their preferences?\nHistory:\n",
+    "Use the details from the conversation history to recommend a movie that matches the user's tastes.\nDialogue History:\n"
+  ],
+  "node": [
+    "Please specify the node type (actor, director, genre, keywords, production company) and briefly provide associated details.",
+    "Specify the category of movie-related personnel or aspect and provide a concise summary.",
+    "Indicate the node type related to movies and offer a short overview of the associated key details.",
+    "What is the category of this node, and what are the main details related to it?",
+    "What is the type of movie-related entity, and what are some key details about it?"
+  ],
+  "movie": [
+    "Please summarize the details of the movie node, including its title, year, genre, keywords, director, and plot.",
+    "Provide a concise summary of the movie, including elements such as its title, release year, genre, key themes, director, and a brief plot overview.",
+    "Detail this movie's specifics.",
+    "Present a summary of this film, noting its title, release year, genre, key themes, director, and plot.",
+    "Give a brief rundown of the movie, specifying the title, year it was made, genre, key terms, director, and plot."
+  ],
+  "preference": [
+    "Please analyze the user's conversation history and relevant movie knowledge graph data to summarize the user's overall movie preferences and current interests into keywords. Start with a brief reasoning and return all in JSON format.\nHistory:\n",
+    "Analyze the user’s conversation history and movie knowledge graph data to identify overall movie preferences and current interests in keywords. Briefly explain your analysis and present the results in JSON format.\nHistory:\n",
+    "Please review the user's conversations and available movie knowledge graph data to identify user's overall preferences and current interests in keywords. Think step by step and explain briefly in JSON format.\nHistory:\n",
+    "Evaluate the user's past discussions and provided movie data to identify overall movie preferences and current interests in keywords. Think step by step and summarize in JSON format.\nDialogue History:\n",
+    "Analyze the conversation history and movie knowledge graph data to capture essential keywords and outline the user’s general movie tastes. Provide this summary along with a short explanation in JSON format.\nConversation History:\n"
+  ],
+  "kg": [
+    "Write a description of the movie: ",
+    "Provide a brief summary of the movie, specifying its title, release year, genres, keywords, actors, directors, and plot elements.",
+    "Give a brief overview of the movie, highlighting essential information ",
+    "Summarize the movie, ensuring to include details such as the title, year, genres, keywords, starring, directors, and plot.",
+    "Give a brief overview of the movie knowledge graph data: "
+  ]
+}

@@ -1,0 +1,40 @@
+defaults:
+  - /trainer@trainer: tasks/rec
+  - _self_
+
+pl:
+  _target_: src.llmcrs.models.lightning_modules.KBRDLightning
+  is_compile: False
+  base_lr: 0.0005
+  base_weight_decay: 0
+  kg_lr: 0.0005
+  kg_weight_decay: 0.00001
+  use_cl: True
+
+  net:
+    _target_: src.llmcrs.models.recommendation.KBRD
+    n_bases: 8
+    kg_dim: 128
+    item_dim: 128
+    use_bert: False
+    pooling_method: cls
+    use_cl: False
+    use_llm_embedding: True
+
+  optimizer:
+    _target_: torch.optim.Adam
+    _partial_: true
+
+  scheduler:
+    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+    _partial_: true
+    mode: min
+    factor: 0.1
+    patience: 3
+
+# model specific trainer configuration
+trainer:
+  max_epochs: 50
+  gradient_clip_val: 1.0
+  precision: "bf16-true"
+  accumulate_grad_batches: 1

@@ -1,0 +1,4 @@
+defaults:
+  - /model@rec: rec/llama
+
+system_name: llama_system

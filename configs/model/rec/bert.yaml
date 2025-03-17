@@ -1,0 +1,41 @@
+defaults:
+  - /trainer@trainer: tasks/rec
+  - _self_
+
+pl:
+  _target_: src.llmcrs.models.lightning_modules.BERTLightning
+  base_lr: 1e-3
+  base_weight_decay: 0.0
+
+  net:
+    _target_: src.llmcrs.models.recommendation.BERTModel
+    model_name: bert-base-uncased
+    pooling_strategy: cls
+    item_dim: 768
+    use_bert: False
+    use_llm_embedding: True
+    use_cl: False
+    pooling_method: cls
+
+  optimizer:
+    _target_: torch.optim.Adam
+    _partial_: true
+
+  scheduler:
+    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+    _partial_: true
+    mode: min
+    factor: 0.1
+    patience: 3
+
+# model specific trainer configuration
+trainer:
+  max_epochs: 50
+  precision: "bf16-true"
+  accumulate_grad_batches: 1
+
+
+
+
+
+

@@ -1,0 +1,28 @@
+Given the following conversation history, knowledge graph information, and a generated user preference with reasoning, evaluate the quality of the reasoning demonstrated in the generated user preference. Focus solely on the reasoning ability, assessing how well it interprets the user's preferences based on the conversation and how effectively it utilizes the knowledge graph information to form those preferences.
+
+Your evaluation should consider:
+
+- **Logical Coherence:** Assess how logically consistent and coherent the reasoning is in the generated user preference.
+- **Accuracy of Inferences:** Evaluate the accuracy of the inferences made from the conversation history and the knowledge graph information.
+- **Relevance of Recommendation:** Determine how relevant the recommendation is based on the user's expressed interests and the knowledge graph information.
+
+Scoring Guidelines:
+
+90-100: Excellent reasoning with no significant issues. The reasoning is fully coherent, logical, and accurately reflects the user's preferences from the conversation. All inferences are correct and well-supported by the knowledge graph. The recommendation is highly relevant and perfectly matches the user's interests.
+
+70-89: Good reasoning with minor issues. The reasoning is mostly coherent and accurate, with minor inaccuracies. Inferences are generally correct and supported by the conversation and knowledge graph. The recommendation is relevant and aligns well with the user's interests.
+
+50-69: Fair reasoning with noticeable issues. The reasoning is partially coherent with some correct inferences but includes significant inaccuracies or omissions. The recommendation is somewhat relevant but doesn't fully align with the user's expressed interests.
+
+30-49: Poor reasoning with significant problems. The reasoning shows minimal logical coherence with several inaccuracies in inferences. The connection to the conversation and knowledge graph is weak, and the recommendation has little relevance to the user's interests.
+
+0-29: Very poor reasoning with critical failures. The reasoning is illogical, incoherent, and unrelated to the conversation or knowledge graph. Inferences are incorrect or nonsensical, and the recommendation is irrelevant.
+
+Please provide your evaluation in the following JSON format:
+
+```json
+{
+  "explanation": "[Your detailed explanation here]",
+  "score": [Score from 0 to 100]
+}
+```

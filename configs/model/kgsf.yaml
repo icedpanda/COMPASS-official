@@ -1,0 +1,4 @@
+defaults:
+  - /model@rec: rec/kgsf
+
+system_name: kgsf_system

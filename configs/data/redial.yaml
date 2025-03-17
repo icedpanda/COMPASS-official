@@ -1,0 +1,20 @@
+defaults:
+  - dataset
+  - /data@dataloader.rec: dataloader
+
+dataset:
+  dataset_name: "ReDial"
+  response_max_len: 32
+  context_max_len: 256
+  restore: False
+  tokenizer_name: "bert-base-uncased"
+  llm_tokenizer_name: "meta-llama/Llama-3.1-8B-Instruct"
+
+
+dataloader:
+  rec:
+    _target_: src.llmcrs.data.ReDialDataModule
+    num_workers: 6
+    train_batch_size: 256
+    val_batch_size: 512
+    test_batch_size: 512

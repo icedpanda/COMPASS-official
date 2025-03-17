@@ -1,0 +1,316 @@
+from typing import Tuple
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch import Tensor
+
+
+@torch.no_grad()
+def random_sample(head_idx: Tensor, tail_idx: Tensor, num_nodes) -> Tuple[Tensor, Tensor]:
+    # random sample either head or tail
+    num_negatives = head_idx.numel() // 2
+    random_idx = torch.randint(num_nodes, head_idx.size(), device=head_idx.device)
+
+    head_idx = head_idx.clone()
+    tail_idx = tail_idx.clone()
+    head_idx[:num_negatives] = random_idx[:num_negatives]
+    tail_idx[num_negatives:] = random_idx[num_negatives:]
+
+    return head_idx, tail_idx
+
+
+class ContrastiveLoss(nn.Module):
+    """
+    Contrastive loss function from https://github.com/google-research/simclr.
+    """
+
+    def __init__(self, temperature=0.07, label_smoothing=0.0):
+        super(ContrastiveLoss, self).__init__()
+        self.temperature = temperature
+        self.loss_func = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
+
+    def forward(self, view1, view2):
+        # view1, view2: batch_size, hidden_size
+        views = torch.cat([view1, view2], dim=0)
+        bs = view1.shape[0]
+
+        # create labels
+        labels = torch.cat([torch.arange(bs) for _ in range(2)], dim=0)
+        labels = (labels.unsqueeze(0) == labels.unsqueeze(1)).float()
+        labels = labels.to(views.device)
+
+        # similarity matrix
+        features = F.normalize(views, dim=1)
+        similarity_matrix = torch.matmul(features, features.T)
+        assert similarity_matrix.shape == (2 * bs, 2 * bs)
+        assert similarity_matrix.shape == labels.shape
+
+        # discard the main diagonal from both: labels and similarities matrix
+        mask = torch.eye(labels.shape[0], dtype=torch.bool, device=labels.device)
+        labels = labels[~mask].view(labels.shape[0], -1)
+        similarity_matrix = similarity_matrix[~mask].view(similarity_matrix.shape[0], -1)
+
+        positives = similarity_matrix[labels.bool()].view(labels.shape[0], -1)
+        negatives = similarity_matrix[~labels.bool()].view(similarity_matrix.shape[0], -1)
+
+        return self._compute_loss(positives, negatives)
+
+    def _compute_loss(self, positives, negatives):
+        logits = torch.cat([positives, negatives], dim=1)
+        logits /= self.temperature
+        labels = torch.zeros(logits.shape[0], dtype=torch.long, device=logits.device)
+        return self.loss_func(logits, labels)
+
+
+class RotatE(nn.Module):
+    def __init__(self, num_nodes: int, num_relations: int, hidden_channels: int, sparse: bool = False,
+                 margin: float = 1.0):
+        super().__init__()
+        # only has node embeddings im here, and use node embeddings from our GNN model
+        self.num_nodes = num_nodes
+        self.node_emb_im = nn.Embedding(num_nodes, hidden_channels, sparse=sparse, padding_idx=0)
+        self.rel_emb = nn.Embedding(num_relations, hidden_channels, sparse=sparse)
+        self.margin = margin
+
+    def forward(self, node_embd: Tensor, head_idx: Tensor, rel_type: Tensor, tail_idx: Tensor) -> Tensor:
+        head_re = node_embd[head_idx]
+        head_im = self.node_emb_im(head_idx)
+        tail_re = node_embd[tail_idx]
+        tail_im = self.node_emb_im(tail_idx)
+
+        rel_theta = self.rel_emb(rel_type)
+        rel_re, rel_im = torch.cos(rel_theta), torch.sin(rel_theta)
+
+        re_score = (rel_re * head_re - rel_im * head_im) - tail_re
+        im_score = (rel_re * head_im + rel_im * head_re) - tail_im
+
+        complex_score = torch.stack([re_score, im_score], dim=2)
+        score = torch.linalg.vector_norm(complex_score, dim=(1, 2))
+
+        return self.margin - score
+
+    def loss(self, node_embd: Tensor, head_idx, rel_type, tail_idx):
+        pos_score = self.forward(node_embd, head_idx, rel_type, tail_idx)
+        neg_head_idx, neg_tail_idx = random_sample(head_idx, tail_idx, self.num_nodes)
+        neg_score = self.forward(node_embd, neg_head_idx, rel_type, neg_tail_idx)
+
+        scores = torch.cat([pos_score, neg_score], dim=0)
+
+        pos_target = torch.ones_like(pos_score)
+        neg_target = torch.zeros_like(neg_score)
+
+        target = torch.cat([pos_target, neg_target], dim=0)
+
+        return F.binary_cross_entropy_with_logits(scores, target)
+
+
+class TransE(nn.Module):
+    def __init__(self,
+                 num_nodes: int,
+                 num_relations: int,
+                 hidden_channels: int,
+                 sparse: bool = False,
+                 margin: float = 1.0,
+                 p_norm: float = 1.0,
+                 ):
+        super().__init__()
+        self.rel_emb = nn.Embedding(num_relations, hidden_channels, sparse=sparse)
+        self.num_nodes = num_nodes
+        self.p_norm = p_norm
+        self.margin = margin
+
+    def forward(self, node_embd: Tensor, head_idx: Tensor, rel_type: Tensor, tail_idx: Tensor) -> Tensor:
+        head_embd = node_embd[head_idx]
+        tail_embd = node_embd[tail_idx]
+        rel_embd = self.rel_emb(rel_type)
+
+        head_embd = F.normalize(head_embd, p=self.p_norm, dim=-1)
+        tail_embd = F.normalize(tail_embd, p=self.p_norm, dim=-1)
+        rel_embd = F.normalize(rel_embd, p=self.p_norm, dim=-1)
+
+        return -((head_embd + rel_embd) - tail_embd).norm(p=self.p_norm, dim=-1)
+
+    def loss(self, node_embd: Tensor, head_idx: Tensor, rel_type: Tensor, tail_idx: Tensor) -> Tensor:
+        pos_score = self.forward(node_embd, head_idx, rel_type, tail_idx)
+        neg_head_idx, neg_tail_idx = random_sample(head_idx, tail_idx, self.num_nodes)
+        neg_score = self.forward(node_embd, neg_head_idx, rel_type, neg_tail_idx)
+
+        return F.margin_ranking_loss(pos_score, neg_score, target=torch.ones_like(pos_score), margin=self.margin)
+
+
+class SigLipLoss(nn.Module):
+    """ Sigmoid Loss for Language Image Pre-Training (SigLIP) - https://arxiv.org/abs/2303.15343
+
+    @article{zhai2023sigmoid,
+      title={Sigmoid loss for language image pre-training},
+      author={Zhai, Xiaohua and Mustafa, Basil and Kolesnikov, Alexander and Beyer, Lucas},
+      journal={arXiv preprint arXiv:2303.15343},
+      year={2023}
+    }
+    """
+
+    def __init__(
+            self,
+            cache_labels=False,
+            rank=0,
+            world_size=1,
+            bidir=True,
+            use_horovod=False,
+    ):
+        super().__init__()
+        self.cache_labels = cache_labels
+        self.rank = rank
+        self.world_size = world_size
+        assert not use_horovod  # FIXME need to look at hvd ops for ring transfers
+        self.use_horovod = use_horovod
+        self.bidir = bidir
+
+    def get_ground_truth(self, device, dtype, num_logits, negative_only=False) -> torch.Tensor:
+        labels = -torch.ones((num_logits, num_logits), device=device, dtype=dtype)
+        if not negative_only:
+            labels = 2 * torch.eye(num_logits, device=device, dtype=dtype) + labels
+        return labels
+
+    def get_logits(self, image_features, text_features, logit_scale, logit_bias=None):
+        logits = logit_scale * image_features @ text_features.T
+        if logit_bias is not None:
+            logits += logit_bias
+        return logits
+
+    def _loss(self, image_features, text_features, logit_scale, logit_bias=None, negative_only=False):
+        logits = self.get_logits(image_features, text_features, logit_scale, logit_bias)
+        labels = self.get_ground_truth(
+            image_features.device,
+            image_features.dtype,
+            image_features.shape[0],
+            negative_only=negative_only,
+        )
+        loss = -F.logsigmoid(labels * logits).sum() / image_features.shape[0]
+        return loss
+
+    def forward(self, image_features, text_features, logit_scale, logit_bias, output_dict=False):
+        loss = self._loss(image_features, text_features, logit_scale, logit_bias)
+
+        if self.world_size > 1:
+            # exchange text features w/ neighbour world_size - 1 times
+            right_rank = (self.rank + 1) % self.world_size
+            left_rank = (self.rank - 1 + self.world_size) % self.world_size
+            if self.bidir:
+                text_features_to_right = text_features_to_left = text_features
+                num_bidir, remainder = divmod(self.world_size - 1, 2)
+                for i in range(num_bidir):
+                    text_features_recv = neighbour_exchange_bidir_with_grad(
+                        left_rank,
+                        right_rank,
+                        text_features_to_left,
+                        text_features_to_right,
+                    )
+
+                    for f in text_features_recv:
+                        loss += self._loss(
+                            image_features,
+                            f,
+                            logit_scale,
+                            logit_bias,
+                            negative_only=True,
+                        )
+                    text_features_to_left, text_features_to_right = text_features_recv
+
+                if remainder:
+                    text_features_recv = neighbour_exchange_with_grad(
+                        left_rank, right_rank, text_features_to_right)
+
+                    loss += self._loss(
+                        image_features,
+                        text_features_recv,
+                        logit_scale,
+                        logit_bias,
+                        negative_only=True,
+                    )
+            else:
+                text_features_to_right = text_features
+                for i in range(self.world_size - 1):
+                    text_features_from_left = neighbour_exchange_with_grad(
+                        left_rank, right_rank, text_features_to_right)
+
+                    loss += self._loss(
+                        image_features,
+                        text_features_from_left,
+                        logit_scale,
+                        logit_bias,
+                        negative_only=True,
+                    )
+                    text_features_to_right = text_features_from_left
+
+        return {"contrastive_loss": loss} if output_dict else loss
+
+
+def neighbour_exchange_bidir(left_rank, right_rank, tensor_to_left, tensor_to_right, group=None):
+    tensor_from_left = torch.zeros_like(tensor_to_right)
+    tensor_from_right = torch.zeros_like(tensor_to_left)
+    send_op_left = torch.distributed.P2POp(
+        torch.distributed.isend,
+        tensor_to_left,
+        left_rank,
+        group=group,
+    )
+    send_op_right = torch.distributed.P2POp(
+        torch.distributed.isend,
+        tensor_to_right,
+        right_rank,
+        group=group,
+    )
+    recv_op_left = torch.distributed.P2POp(
+        torch.distributed.irecv,
+        tensor_from_left,
+        left_rank,
+        group=group,
+    )
+    recv_op_right = torch.distributed.P2POp(
+        torch.distributed.irecv,
+        tensor_from_right,
+        right_rank,
+        group=group,
+    )
+    reqs = torch.distributed.batch_isend_irecv([send_op_right, send_op_left, recv_op_right, recv_op_left])
+    for req in reqs:
+        req.wait()
+    return tensor_from_right, tensor_from_left
+
+
+def neighbour_exchange(from_rank, to_rank, tensor, group=None):
+    tensor_recv = torch.zeros_like(tensor)
+    send_op = torch.distributed.P2POp(
+        torch.distributed.isend,
+        tensor,
+        to_rank,
+        group=group,
+    )
+    recv_op = torch.distributed.P2POp(
+        torch.distributed.irecv,
+        tensor_recv,
+        from_rank,
+        group=group,
+    )
+    reqs = torch.distributed.batch_isend_irecv([send_op, recv_op])
+    for req in reqs:
+        req.wait()
+    return tensor_recv
+
+
+class NeighbourExchange(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, from_rank, to_rank, group, tensor):
+        ctx.group = group
+        ctx.from_rank = from_rank
+        ctx.to_rank = to_rank
+        return neighbour_exchange(from_rank, to_rank, tensor, group=group)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        return (None, None, None) + (NeighbourExchange.apply(ctx.to_rank, ctx.from_rank, ctx.group, grad_output),)
+
+
+def neighbour_exchange_with_grad(from_rank, to_rank, tensor, group=None):
+    return NeighbourExchange.apply(from_rank, to_rank, group, tensor)

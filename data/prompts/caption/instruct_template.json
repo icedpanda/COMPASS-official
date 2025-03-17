@@ -1,0 +1,23 @@
+{
+  "rec": [
+    "As a movie recommender, please recommend a movie that aligns with the user's interests discussed in the provided conversation history.\nConversation History:\n",
+    "Acting as a movie suggestion tool, utilize the user’s preferences mentioned in the provided conversation history to suggest a suitable movie.\nConversation History:\n",
+    "Based on the details of the user's likes and dislikes in the provided conversation history, identify a movie that matches their interests.\nHistory:\n",
+    "Considering the interests the user has mentioned previously, can you recommend a film that would suit their preferences?\nHistory:\n",
+    "Use the details from the conversation history to recommend a movie that matches the user's tastes.\nDialogue History:\n"
+  ],
+  "node": [
+    "Please specify the node type (actor, director, genre, keywords, production company) and briefly provide associated details.",
+    "Specify the category of movie-related personnel or aspect and provide a concise summary.",
+    "Indicate the node type related to movies and offer a short overview of the associated key details.",
+    "What is the category of this node, and what are the main details related to it?",
+    "What is the type of movie-related entity, and what are some key details about it?"
+  ],
+  "movie": [
+    "Please summarize the details of the movie node, including its title, year, genre, keywords, director, and plot.",
+    "Provide a concise summary of the movie, including elements such as its title, release year, genre, key themes, director, and a brief plot overview.",
+    "Detail this movie's specifics.",
+    "Present a summary of this film, noting its title, release year, genre, key themes, director, and plot.",
+    "Give a brief rundown of the movie, specifying the title, year it was made, genre, key terms, director, and plot."
+  ],
+}

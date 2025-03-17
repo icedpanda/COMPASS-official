@@ -1,0 +1,4 @@
+defaults:
+  - /callbacks@rec: tasks/recommendation
+
+

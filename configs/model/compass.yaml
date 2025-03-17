@@ -1,0 +1,7 @@
+defaults:
+  - /model@align: alignment/compass
+  - /model@rec: rec/compass
+
+pre_train: True
+system_name: compass_system
+# GNN + CRS

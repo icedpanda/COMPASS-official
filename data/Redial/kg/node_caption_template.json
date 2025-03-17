@@ -1,0 +1,39 @@
+{
+  "genre": [
+    "This node summarizes movies associated with the {genre} genre.",
+    "This node focuses on {genre} type movies.",
+    "Movies here are primarily categorized under the {genre} genre.",
+    "A collection of {genre} films defines this node.",
+    "This node represents a movie genre that is {genre}."
+  ],
+  "actor": [
+    "This node summarizes movies featuring actor {actor}.",
+    "This node focuses on films starring {actor}.",
+    "Movies with {actor} prominently featured make up this node.",
+    "This node collects major works of actor {actor}.",
+    "This node highlights films that star {actor}."
+  ],
+  "director": [
+    "This node summarizes movies directed by {director}.",
+    "This node focuses on films by director {director}.",
+    "Films directed by {director} are centrally featured in this node.",
+    "This node is a compilation of {director}'s directorial efforts.",
+    "A selection of {director}'s films defines this node."
+  ],
+  "company": [
+    "This node summarizes films produced by {company}.",
+    "This node focuses on movies from the production company {company}.",
+    "Productions by {company} are highlighted in this node.",
+    "This node represents the movie production company {company}.",
+    "Films from {company} prominently make up this node."
+  ],
+  "keyword": [
+    "This node summarizes movies associated with the keyword of {keyword}.",
+    "This node focuses on movies themed around {keyword}.",
+    "Films grouped in this node feature the theme: {keyword}.",
+    "This node aggregates movies revolving around the keyword: {keyword}.",
+    "This node indicates films related to the keyword: {keyword}."
+  ]
+}
+
+

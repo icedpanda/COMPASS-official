@@ -1,0 +1,56 @@
+defaults:
+  - /trainer@trainer: tasks/rec
+  - _self_
+
+pl:
+  _target_: src.llmcrs.models.lightning_modules.COMPASSLightning
+  # compile model for faster training with pytorch 2.0
+  is_compile: False
+  base_lr: 1e-5
+  base_weight_decay: 0.0
+  kg_lr: 1e-5
+  kg_weight_decay: 0.0
+  is_kg_freeze: False
+
+  net:
+    _target_: src.llmcrs.models.recommendation.COMPASS
+    model_name: "meta-llama/Llama-3.1-8B-Instruct"
+    is_lora: True
+    lora_config:
+      _target_: peft.LoraConfig
+      r: 8
+      lora_alpha: 32
+      lora_dropout: 0.05
+      target_modules: [ q_proj, k_proj, v_proj, o_proj, up_proj, down_proj, lm_head,]
+      bias: none
+      task_type: CAUSAL_LM
+    ent_dim: 768
+    rel_dim: 768
+    ent_path: data/Redial/kg/bert_entity_embeddings.pt
+    rel_path: data/Redial/kg/bert_relation_embeddings.pt
+    in_dim: 768
+    hid_dim: 768
+    out_dim: 768
+    num_bases: 8
+    num_relations: 11
+    dropout: 0.1
+
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true
+
+  scheduler:
+    _target_: transformers.get_cosine_schedule_with_warmup
+    _partial_: true
+    num_cycles: 0.5
+
+# model specific trainer configuration
+trainer:
+  max_epochs: 5
+  precision: "bf16-true"
+  accumulate_grad_batches: 8
+  devices: 1
+  strategy: "auto"
+#  limit_train_batches: 0.03 # How much of training dataset to check (float = fraction, int = num_batches)
+#  limit_val_batches: 0.04 # How much of validation dataset to check (float = fraction, int = num_batches)
+#  limit_test_batches: 0.05 # How much of test dataset to check (float = fraction, int = num_batches)

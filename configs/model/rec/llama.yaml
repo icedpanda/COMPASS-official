@@ -1,0 +1,43 @@
+defaults:
+  - /trainer@trainer: tasks/rec
+  - _self_
+
+pl:
+  _target_: src.llmcrs.models.lightning_modules.LLMCRSLightning
+  is_compile: False
+  use_reasoning: True
+  base_lr: 1e-4
+  base_weight_decay: 0.0
+
+  net:
+    _target_: src.llmcrs.models.recommendation.LLAMA
+    model_name: meta-llama/Llama-3.1-8B-Instruct
+    pooling_strategy: last_token
+    item_dim: 768
+    reasoner: False
+    lora_config:
+      _target_: peft.LoraConfig
+      r: 8
+      lora_alpha: 32
+      lora_dropout: 0.05
+      target_modules: [ q_proj, k_proj, v_proj, o_proj, up_proj, down_proj]
+      bias: none
+      task_type: FEATURE_EXTRACTION
+
+  optimizer:
+    _target_: torch.optim.AdamW
+    _partial_: true
+
+  scheduler:
+    _target_: transformers.get_cosine_schedule_with_warmup
+    _partial_: true
+    num_cycles: 0.5
+
+# model specific trainer configuration
+trainer:
+  max_epochs: 10
+  precision: "bf16-true"
+  gradient_clip_val: 1.0
+  accumulate_grad_batches: 16
+  devices: 1
+  strategy: auto

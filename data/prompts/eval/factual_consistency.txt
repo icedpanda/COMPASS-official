@@ -1,0 +1,27 @@
+Evaluate the factual consistency of the generated user preference summary.
+Focus on how accurately it reflects information from the conversation history and the knowledge graph, especially the keywords from "overall preferences" and "current interests".
+
+Your evaluation should consider:
+
+- **Alignment with Conversation History:** Does the summary accurately capture the user's expressed preferences and interests from the conversation?
+- **Consistency with Knowledge Graph:** Are the "overall preferences" and "current interests" keywords are supported by the knowledge graph content?
+- **Absence of Incorrect or Unsupported Claims:** Ensure the summary does not include incorrect information or claims not supported by the conversation history or knowledge graph, considering acceptable expansions.
+
+Scoring Guidelines:
+
+90-100: Excellent factual consistency with no significant issues. The summary accurately reflects the conversation and knowledge graph, including any reasonable expansions.
+
+70-89: Good factual consistency with minor issues. The summary mostly reflects the conversation and knowledge graph, with minor inaccuracies or unsupported expansions.
+
+50-69: Fair factual consistency with noticeable issues. The summary has some inaccuracies, unsupported claims, or unreasonable expansions.
+
+30-49: Poor factual consistency with significant problems. The summary includes significant inaccuracies, unsupported claims, or unreasonable expansions.
+
+0-29: Very poor factual consistency with critical failures. The summary is largely inconsistent with the conversation and knowledge graph, containing many incorrect or unsupported claims.
+
+```json
+{
+  "explanation": "[Your detailed explanation here]",
+  "score": [Score from 0 to 100]
+}
+```

@@ -1,0 +1,9 @@
+dataset:
+  dataset_name: ??? # the dataset name must be specified!
+  restore: False
+  context_max_len: 256
+  use_item_feature: False
+  item_feature_type: "default" # default, title, description, info
+  user_feature_type: "history" # history, preference_summary, both
+  response_max_len: ??? # the response max length must be specified!
+  tokenizer_name: ??? # the tokenizer name must be specified!

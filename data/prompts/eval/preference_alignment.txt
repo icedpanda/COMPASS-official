@@ -1,0 +1,14 @@
+As a user of a conversational recommender system, please compare the following three summaries of your preferences and movie recommendations.
+ Rank them in order of preference (best to worst) based on:
+
+1. User-Preference Alignment: How accurately does the summary capture your preferences and provide a recommendation that feels personalized to your interests?
+
+Provide your evaluation in the following JSON format:
+```json
+{
+'alignment': {
+'reason': '<explanation for alignment ranking>'
+'ranking': ['<first>', '<second>', '<third>'],
+},
+}
+```

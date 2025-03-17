@@ -1,0 +1,13 @@
+{
+  "0": "is_genre_of",
+  "1": "is_actor_of",
+  "2": "is_director_of",
+  "3": "is_production_company_of",
+  "4": "is_keyword_of",
+  "5": "has_genre",
+  "6": "has_actor",
+  "7": "has_director",
+  "8": "has_production_company",
+  "9": "has_keyword",
+  "10": "self_loop"
+}

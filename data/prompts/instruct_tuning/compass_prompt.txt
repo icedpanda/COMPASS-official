@@ -1,0 +1,6 @@
+As a movie recommender, analyze the user's conversation history to make a movie recommendation. Break down the analysis into clear steps and return in json format:
+1. 'reasoning': analysis the user's conversation history and knowledge graph data highlight their movie preferences.
+2. 'overall preferences': A list of keywords summarizing the user's overall preferences.
+3. 'current interests': A list of keywords reflecting user's current interests.\n
+4. 'recommendation': a recommended movie title.
+History:

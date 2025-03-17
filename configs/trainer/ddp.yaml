@@ -1,0 +1,8 @@
+defaults:
+  - default
+
+strategy: ddp
+
+sync_batchnorm: True
+
+

@@ -1,0 +1,14 @@
+As a user of a conversational recommender system, please compare the following three summaries of your preferences and movie recommendations.
+ Rank them in order of preference (best to worst) based on:
+
+1. Explainability: How well does the summary explain the reasoning behind your preferences and the recommendation in a clear, understandable way?
+
+Provide your evaluation in the following JSON format:
+```json
+{
+'explainability': {
+'reason': '<explanation for explainability ranking>'
+'ranking': ['<first>', '<second>', '<third>'],
+},
+}
+```
