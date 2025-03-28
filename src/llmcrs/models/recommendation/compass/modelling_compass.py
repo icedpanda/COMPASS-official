@@ -13,6 +13,7 @@ from transformers.utils import ModelOutput
 
 from src.llmcrs.data.dataset.utils import edge_to_pyg_format
 from src.llmcrs.models.utils.modules import create_mask
+from src.llmcrs.models.utils import RGCN
 
 load_dotenv()
 ALLOWED_BERT_MODELS = {"meta-llama/Llama-2-7b-chat-hf",
@@ -169,12 +170,12 @@ class COMPASS(nn.Module):
         self.lora_config = lora_config
         self.kg_embeds = KnowledgeEmbedding(
             edges, n_ent, n_rel, ent_dim, rel_dim, ent_path, rel_path, )
-        # self.graph_encoder = RGCN(
-        #     num_relations=num_relations, in_dim=in_dim, hid_dim=hid_dim, out_dim=out_dim, num_bases=num_bases,
-        #     dropout=dropout)
-        self.graph_encoder = GAT(
-            in_dim, out_dim,
-        )
+        self.graph_encoder = RGCN(
+            num_relations=num_relations, in_dim=in_dim, hid_dim=hid_dim, out_dim=out_dim, num_bases=num_bases,
+            dropout=dropout)
+        # self.graph_encoder = GAT(
+        #     in_dim, out_dim,
+        # )
         self.is_lora = is_lora
         self.init_llm()
         self.max_llm_prompt_len = 1024
@@ -209,9 +210,9 @@ class COMPASS(nn.Module):
     def get_kg_feature(self):
         x = self.kg_embeds.get_ent_embeddings()
         edge_idx, edge_type = self.kg_embeds.get_edge_idx(), self.kg_embeds.get_edge_type()
-        # kg_feat = self.graph_encoder(x, edge_idx, edge_type)
+        kg_feat = self.graph_encoder(x, edge_idx, edge_type)
         # edge_embed = self.kg_embeds.get_rel_embeddings(edge_type)
-        kg_feat = self.graph_encoder(x, edge_idx)
+        # kg_feat = self.graph_encoder(x, edge_idx)
         return kg_feat
 
     def forward(self, context_entities, llm_inputs, labels=None):
