@@ -35,4 +35,4 @@ def run_crs(opts: DictConfig):
     dataset = instantiate_dataset(opts)
     system_class = get_system(opts.model.system_name)
     system = system_class(dataset, opts)
-    # system.fit()
+    system.fit()
