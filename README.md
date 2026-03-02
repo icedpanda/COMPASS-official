@@ -61,7 +61,7 @@ Then update the `config/default.yaml` file with the baseline model name and run 
   number={},
   pages={1495-1504},
   keywords={Large language models;Natural languages;Transforms;Knowledge graphs;Benchmark testing;Cognition;Vectors;User preference;Compass;Recommender systems;Conversational Recommender System;Large Language Model;Knowledge Graph;Explainable Recommendation},
-  doi={10.1109/ICDM65498.2025.00159}}
+  doi={10.1109/ICDM65498.2025.00159}
 
 }
 ```
