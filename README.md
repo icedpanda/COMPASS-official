@@ -52,12 +52,16 @@ Then update the `config/default.yaml` file with the baseline model name and run 
 ## Citation
 
 ```bibtex
-@article{qiu2025reasoninguserpreferencesknowledge,
-  title={Reasoning over User Preferences: Knowledge Graph-Augmented LLMs for Explainable Conversational Recommendations},
+@INPROCEEDINGS{11393682,
   author={Qiu, Zhangchi and Luo, Linhao and Pan, Shirui and Liew, Alan Wee-Chung},
-  journal={arXiv preprint arXiv:2411.14459},
-  url={https://arxiv.org/abs/2411.14459},
-  eprint={2411.14459}, 
+  booktitle={2025 IEEE International Conference on Data Mining (ICDM)}, 
+  title={Reasoning Over User Preferences: Knowledge Graph-Augmented LLMs for Explainable Conversational Recommendations}, 
   year={2025},
+  volume={},
+  number={},
+  pages={1495-1504},
+  keywords={Large language models;Natural languages;Transforms;Knowledge graphs;Benchmark testing;Cognition;Vectors;User preference;Compass;Recommender systems;Conversational Recommender System;Large Language Model;Knowledge Graph;Explainable Recommendation},
+  doi={10.1109/ICDM65498.2025.00159}}
+
 }
 ```
